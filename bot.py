@@ -1,9 +1,24 @@
-import discord, json, os, random,shutil
+import discord, json, os, random,shutil, sys
 from discord import colour
 from discord.ext import commands
 from datetime import datetime
 from colorama import init, Style, Back, Fore
+import traceback
 init()
+
+string= "-> Python Core " + sys.version + "\n"
+if sys.platform in ["win32", "cygwin"]:
+    platform = "Windows "
+    ver = sys.getwindowsversion()
+    platform += f"{ver.major}(.{ver.minor}) build {ver.build}"
+    string+= f"-> Platform: {platform} \n"
+    del platform
+impl = sys.implementation
+impl = f"{impl.name}/Tag: {impl.cache_tag}"
+string += f"-> Implementation: {impl} \n"
+string += f"-> Core C API Version: {sys.api_version}"
+print(f'{Fore.LIGHTGREEN_EX}{Style.BRIGHT}[{datetime.now()}] [DEBINF] - Debug info: {string}{Style.RESET_ALL}')
+del string, impl, ver
 
 if not os.path.isdir("backup"): os.mkdir("backup")
 if not os.path.isfile("credit.json"): 
@@ -32,6 +47,13 @@ with open("credit.json", "r", encoding="utf-8") as file:
 def save():
     with open("credit.json", "w", encoding="utf-8") as file:
         json.dump(bot.db, file, indent=4)
+
+@bot.event
+async def on_command_error(ctx, error):
+    blacklist = ["MissingPermissions", "MemberNotFound"] # Расизм, расия)
+    if type(error).__name__ in blacklist: return
+    print(f'{Fore.RED}[{datetime.now()}] [ERRMSG] - Error Raised! More info below:{Style.RESET_ALL}')
+    print(f"{Fore.LIGHTRED_EX}-> {error}{Style.RESET_ALL}")
 
 @bot.event
 async def on_ready():
@@ -65,7 +87,7 @@ async def reload(ctx):
         bot.unload_extension('cogs.credit')
         bot.load_extension('cogs.credit')
         await ctx.send('Бот перезагружен!')
-        print(f'{Fore.LIGHTYELLOW_EX}[{datetime.now()}] [RELOAD] - Reloaded.{Style.RESET_ALL}')
+        print(f'{Fore.LIGHTYELLOW_EX}[{datetime.now()}] [RELOAD] - Reloaded by {ctx.author}.{Style.RESET_ALL}')
 
 # ТОКЕН
 bot.run(TOKEN)
