@@ -79,7 +79,7 @@ class credit(commands.Cog): # я не ебу - а ты еби-
     @commands.command(name="save", aliases=[])
     async def save_cmd(self, ctx):
         if self.owner_check(ctx.author.id):
-            print(f"{Fore.LIGHTCYAN_EX}[{datetime.now()}] [COMMND] - User {ctx.author} called for a DB backup.{Style.RESET_ALL}")
+            print(f"{Fore.LIGHTCYAN_EX}[{datetime.now()}] [I] [COMMND] - User {ctx.author} called for a DB backup.{Style.RESET_ALL}")
             backup()
             self.save()
             emb = discord.Embed(
