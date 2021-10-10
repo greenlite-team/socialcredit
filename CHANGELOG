@@ -1,0 +1,11 @@
+[.gitignore] Added __pycache__ #Krutos
+[bot.py] [cogs/credit.py] Added logs type - [W](arning), [E](rror)... #Krutos
+[functions.py] Added file to delete some shitcode. #Krutos
+[functions.py] debug_info function is now here. #Krutos
+[bot.py] Importing functions.py to output our debug_info. #Krutos
+[CHANGELOG] Just created changelog? -w- #Krutos
+[bot.py] If cogs.credit unloaded, print out warning to console. #Krutos
+[functions.py] Some functions migrated here. Also, created std replacement. And, backup function is also here. #Krutos
+[bot.py] Added logout #Krutos
+[env.json] Add enviroment file. #Krutos
+[functions.py] Added RAM info into Debug info. #Krutos

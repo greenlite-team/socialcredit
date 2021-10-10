@@ -5,6 +5,8 @@ from discord.ext.commands.core import has_guild_permissions, has_permissions
 from datetime import date, datetime
 from colorama import Style, Back, Fore
 
+from functions import backup, member_not_found, perms_error
+
 class credit(commands.Cog): # я не ебу - а ты еби-
     def __init__(self, bot):
         self.bot = bot
@@ -21,12 +23,12 @@ class credit(commands.Cog): # я не ебу - а ты еби-
     async def autosave(self):
         with open("credit.json", "w", encoding="utf-8") as file:
             json.dump(self.bot.db, file, indent=4)
-            print(f"{Fore.LIGHTBLUE_EX}[{datetime.now()}] [DATABS] - Saved.{Style.RESET_ALL}")
+            print(f"{Fore.LIGHTBLUE_EX}[{datetime.now()}] [I] [DATABS] - Saved.{Style.RESET_ALL}")
 
     def save(self):
         with open("credit.json", "w", encoding="utf-8") as file:
             json.dump(self.bot.db, file, indent=4)
-            print(f"{Fore.LIGHTBLUE_EX}[{datetime.now()}] [DATABS] - Saved.{Style.RESET_ALL}")
+            print(f"{Fore.LIGHTBLUE_EX}[{datetime.now()}] [I] [DATABS] - Saved.{Style.RESET_ALL}")
 
     def add_user(self, user):
         id = str(user.id)
@@ -78,18 +80,14 @@ class credit(commands.Cog): # я не ебу - а ты еби-
     async def save_cmd(self, ctx):
         if self.owner_check(ctx.author.id):
             print(f"{Fore.LIGHTCYAN_EX}[{datetime.now()}] [COMMND] - User {ctx.author} called for a DB backup.{Style.RESET_ALL}")
-            backup = os.path.join("backup", datetime.now().isoformat().replace(":", "."))
-            os.mkdir(backup)
-            shutil.copyfile("credit.json", os.path.join(backup, "credit.json"))
-            print(f'{Fore.LIGHTGREEN_EX}[{datetime.now()}] [BACKUP] - Backed up database to "{backup}"!{Style.RESET_ALL}')
-            del backup
+            backup()
             self.save()
             emb = discord.Embed(
                         title='Датабаза сохранена',
                         color=ctx.guild.me.color
             )
             await ctx.send(embed=emb)
-            print(f"{Fore.LIGHTCYAN_EX}[{datetime.now()}] [COMMND] - User {ctx.author} saved and backed up database.{Style.RESET_ALL}")
+            print(f"{Fore.LIGHTCYAN_EX}[{datetime.now()}] [I] [COMMND] - User {ctx.author} saved and backed up database.{Style.RESET_ALL}")
 
     @commands.command(aliases=[])
     async def fuck(self, ctx):
@@ -112,7 +110,7 @@ class credit(commands.Cog): # я не ебу - а ты еби-
         emb.set_thumbnail(url=ctx.guild.me.avatar_url)
         emb.set_footer(text=user,icon_url=user.avatar_url)
         await ctx.send(embed=emb)
-        print(f"{Fore.LIGHTCYAN_EX}[{datetime.now()}] [COMMND] - User {ctx.author} checked credit of {user}.{Style.RESET_ALL}")
+        print(f"{Fore.LIGHTCYAN_EX}[{datetime.now()}] [I] [COMMND] - User {ctx.author} checked credit of {user}.{Style.RESET_ALL}")
 
     @has_permissions(manage_roles=True) 
     @commands.command(aliases=['addcredit','add_credit','addcr','добавить','pluscredit','plus'])
@@ -125,7 +123,7 @@ class credit(commands.Cog): # я не ебу - а ты еби-
             )
             nouseremb.set_footer(text=ctx.author, icon_url=ctx.author.avatar_url)
             await ctx.send(embed=nouseremb)
-            print(f"{Fore.LIGHTRED_EX}[{datetime.now()}] [CMDERR] - User {ctx.author} tried to add SC but didn't include a user.{Style.RESET_ALL}")
+            print(f"{Fore.LIGHTRED_EX}[{datetime.now()}] [E] [CMDERR] - User {ctx.author} tried to add SC but didn't include a user.{Style.RESET_ALL}")
         elif user == ctx.author:
             userdata = self.remove_from_user(ctx.author, 10)
             selfemb = discord.Embed(
@@ -136,7 +134,7 @@ class credit(commands.Cog): # я не ебу - а ты еби-
             selfemb.set_image(url='https://cdn.discordapp.com/attachments/883779765415337995/896443360842252329/unknown.png')
             selfemb.set_footer(text=ctx.author, icon_url=ctx.author.avatar_url)
             await ctx.send(embed=selfemb)
-            print(f"{Fore.LIGHTMAGENTA_EX}[{datetime.now()}] [CMDERR] - User {ctx.author} tried to give himself SC, so we removed 10 SC from him.{Style.RESET_ALL}")
+            print(f"{Fore.LIGHTMAGENTA_EX}[{datetime.now()}] [E] [CMDERR] - User {ctx.author} tried to give himself SC, so we removed 10 SC from him.{Style.RESET_ALL}")
         else:
             oldcredit = self.check_user(user)['credit']
             try:
@@ -149,7 +147,7 @@ class credit(commands.Cog): # я не ебу - а ты еби-
                 emb.set_thumbnail(url=ctx.guild.me.avatar_url)
                 emb.set_footer(text=f'Добавлено юзером {ctx.author}', icon_url=ctx.author.avatar_url)
                 await ctx.send(embed=emb)
-                print(f"{Fore.LIGHTCYAN_EX}[{datetime.now()}] [COMMND] - User {ctx.author} added {credit} credit to {user}. ({oldcredit} > {userdata['credit']}){Style.RESET_ALL}")
+                print(f"{Fore.LIGHTCYAN_EX}[{datetime.now()}] [I] [COMMND] - User {ctx.author} added {credit} credit to {user}. ({oldcredit} > {userdata['credit']}){Style.RESET_ALL}")
             except ValueError:
                 emb = discord.Embed(
                     title='Ошибка!',
@@ -159,7 +157,7 @@ class credit(commands.Cog): # я не ебу - а ты еби-
                 emb.set_image(url='https://media.discordapp.net/attachments/883779765415337995/896431661632344074/firefox_8oM4iRMc8K.png')
                 emb.set_footer(text=ctx.author, icon_url=ctx.author.avatar_url)
                 await ctx.send(embed=emb)
-                print(f"{Fore.LIGHTRED_EX}[{datetime.now()}] [CMDERR] - User {ctx.author} tried to remove SC but included a negative number.{Style.RESET_ALL}")
+                print(f"{Fore.LIGHTRED_EX}[{datetime.now()}] [E] [CMDERR] - User {ctx.author} tried to remove SC but included a negative number.{Style.RESET_ALL}")
 
     @commands.command(aliases=['removecredit','remove_credit','rmcr','убрать','minuscredit','minus','rm'])
     @has_permissions(manage_roles=True)
@@ -172,7 +170,7 @@ class credit(commands.Cog): # я не ебу - а ты еби-
             )
             nouseremb.set_footer(text=ctx.author, icon_url=ctx.author.avatar_url)
             await ctx.send(embed=nouseremb)
-            print(f"{Fore.LIGHTRED_EX}[{datetime.now()}] [CMDERR] - User {ctx.author} tried to remove SC but didn't include a user.{Style.RESET_ALL}")
+            print(f"{Fore.LIGHTRED_EX}[{datetime.now()}] [E] [CMDERR] - User {ctx.author} tried to remove SC but didn't include a user.{Style.RESET_ALL}")
         elif user == ctx.author:
             userdata = self.remove_from_user(ctx.author, 10)
             selfemb = discord.Embed(
@@ -183,7 +181,7 @@ class credit(commands.Cog): # я не ебу - а ты еби-
             selfemb.set_image(url='https://cdn.discordapp.com/attachments/883779765415337995/896443360842252329/unknown.png')
             selfemb.set_footer(text=ctx.author, icon_url=ctx.author.avatar_url)
             await ctx.send(embed=selfemb)
-            print(f"{Fore.LIGHTMAGENTA_EX}[{datetime.now()}] [CMDERR] - User {ctx.author} tried to remove himself SC, so we removed 10 SC from him.{Style.RESET_ALL}")
+            print(f"{Fore.LIGHTMAGENTA_EX}[{datetime.now()}] [E] [CMDERR] - User {ctx.author} tried to remove himself SC, so we removed 10 SC from him.{Style.RESET_ALL}")
         else:
             oldcredit = self.check_user(user)['credit']
             userdata = self.remove_from_user(user, credit)
@@ -195,7 +193,7 @@ class credit(commands.Cog): # я не ебу - а ты еби-
             emb.set_thumbnail(url=ctx.guild.me.avatar_url)
             emb.set_footer(text=f'Убрано юзером {ctx.author}', icon_url=ctx.author.avatar_url)
             await ctx.send(embed=emb)
-            print(f"{Fore.LIGHTCYAN_EX}[{datetime.now()}] [COMMND] - User {ctx.author} removed {credit} credit from {user}. ({oldcredit} > {userdata['credit']}){Style.RESET_ALL}")
+            print(f"{Fore.LIGHTCYAN_EX}[{datetime.now()}] [I] [COMMND] - User {ctx.author} removed {credit} credit from {user}. ({oldcredit} > {userdata['credit']}){Style.RESET_ALL}")
 
     @has_permissions(manage_roles=True) 
     @commands.command(aliases=['setcredit','set_credit','setcr','установить'])
@@ -208,7 +206,7 @@ class credit(commands.Cog): # я не ебу - а ты еби-
             )
             nouseremb.set_footer(text=ctx.author, icon_url=ctx.author.avatar_url)
             await ctx.send(embed=nouseremb)
-            print(f"{Fore.LIGHTRED_EX}[{datetime.now()}] [CMDERR] - User {ctx.author} tried to remove SC but didn't include a user.{Style.RESET_ALL}")
+            print(f"{Fore.LIGHTRED_EX}[{datetime.now()}] [E] [CMDERR] - User {ctx.author} tried to remove SC but didn't include a user.{Style.RESET_ALL}")
         elif user == ctx.author:
             userdata = self.remove_from_user(ctx.author, 10)
             selfemb = discord.Embed(
@@ -219,7 +217,7 @@ class credit(commands.Cog): # я не ебу - а ты еби-
             selfemb.set_image(url='https://cdn.discordapp.com/attachments/883779765415337995/896443360842252329/unknown.png')
             selfemb.set_footer(text=ctx.author, icon_url=ctx.author.avatar_url)
             await ctx.send(embed=selfemb)
-            print(f"{Fore.LIGHTMAGENTA_EX}[{datetime.now()}] [CMDERR] - User {ctx.author} tried to set himself SC, so we removed 10 SC from him.{Style.RESET_ALL}")
+            print(f"{Fore.LIGHTMAGENTA_EX}[{datetime.now()}] [E] [CMDERR] - User {ctx.author} tried to set himself SC, so we removed 10 SC from him.{Style.RESET_ALL}")
         else:
             oldcredit = self.check_user(user)['credit']
             userdata = self.set_to_user(user, credit)
@@ -231,7 +229,7 @@ class credit(commands.Cog): # я не ебу - а ты еби-
             emb.set_thumbnail(url=ctx.guild.me.avatar_url)
             emb.set_footer(text=f'Установлено юзером {ctx.author}', icon_url=ctx.author.avatar_url)
             await ctx.send(embed=emb)
-            print(f"{Fore.LIGHTCYAN_EX}[{datetime.now()}] [COMMND] - User {ctx.author} set {credit} credit for {user}. ({oldcredit} > {userdata['credit']}){Style.RESET_ALL}")
+            print(f"{Fore.LIGHTCYAN_EX}[{datetime.now()}] [I] [COMMND] - User {ctx.author} set {credit} credit for {user}. ({oldcredit} > {userdata['credit']}){Style.RESET_ALL}")
 
 # ==========
 # = ОШИБКИ =
@@ -240,66 +238,33 @@ class credit(commands.Cog): # я не ебу - а ты еби-
     @add.error
     async def add_error(self, ctx, error):
         if isinstance(error, commands.MissingPermissions):
-            emb = discord.Embed(
-                title='Ошибка прав!',
-                description='Ну и ну! Китай Правительство вам не выдать разрешение **Управление Ролями**, поэтому вы не мочь изменять социальный кредит! Много смех!',
-                color=0xff0000
-            )
-            emb.set_image(url='https://media.discordapp.net/attachments/883778578783821865/896453128185081896/unknown.png')
-            emb.set_footer(text=ctx.author,icon_url=ctx.author.avatar_url)
-            await ctx.send(embed=emb)
+            await perms_error(ctx)
+            print(f"{Fore.LIGHTMAGENTA_EX}[{datetime.now()}] [E] [CMDERR] - User {ctx.author} tried to add SC without permissions{Style.RESET_ALL}")
+
         if isinstance(error, commands.MemberNotFound):
-            emb = discord.Embed(
-                title='Гражданин не обнаружен!',
-                description='Ну и ну! Бот не смочь найти гражданин для добавление социальный кредит!',
-                color=0xff0000
-            )
-            emb.set_image(url='https://media.discordapp.net/attachments/883779765415337995/896458794886918225/unknown.png')
-            emb.set_footer(text=ctx.author,icon_url=ctx.author.avatar_url)
-            await ctx.send(embed=emb)
+            await member_not_found("добавление")
+
+            print(f"{Fore.LIGHTMAGENTA_EX}[{datetime.now()}] [E] [CMDERR] - User {ctx.author} tried to add SC to unknown person.{Style.RESET_ALL}")
     
     @remove.error
     async def remove_error(self, ctx, error):
         if isinstance(error, commands.MissingPermissions):
-            emb = discord.Embed(
-                title='Ошибка прав!',
-                description='Ну и ну! Китай Правительство вам не выдать разрешение **Управление Ролями**, поэтому вы не мочь изменять социальный кредит! Много смех!',
-                color=0xff0000
-            )
-            emb.set_image(url='https://media.discordapp.net/attachments/883778578783821865/896453128185081896/unknown.png')
-            emb.set_footer(text=ctx.author,icon_url=ctx.author.avatar_url)
-            await ctx.send(embed=emb)
+            await perms_error(ctx)
+            print(f"{Fore.LIGHTMAGENTA_EX}[{datetime.now()}] [E] [CMDERR] - User {ctx.author} tried to remove SC without permissions{Style.RESET_ALL}")
         if isinstance(error, commands.MemberNotFound):
-            emb = discord.Embed(
-                title='Гражданин не обнаружен!',
-                description='Ну и ну! Бот не смочь найти гражданин для отнимание социальный кредит!',
-                color=0xff0000
-            )
-            emb.set_image(url='https://media.discordapp.net/attachments/883779765415337995/896458794886918225/unknown.png')
-            emb.set_footer(text=ctx.author,icon_url=ctx.author.avatar_url)
-            await ctx.send(embed=emb)
+            await member_not_found("отнимание")
+
+            print(f"{Fore.LIGHTMAGENTA_EX}[{datetime.now()}] [E] [CMDERR] - User {ctx.author} tried to remove SC from unknown person.{Style.RESET_ALL}")
 
     @set.error
     async def set_error(self, ctx, error):
         if isinstance(error, commands.MissingPermissions):
-            emb = discord.Embed(
-                title='Ошибка прав!',
-                description='Ну и ну! Китай Правительство вам не выдать разрешение **Управление Ролями**, поэтому вы не мочь изменять социальный кредит! Много смех!',
-                color=0xff0000
-            )
-            emb.set_image(url='https://media.discordapp.net/attachments/883778578783821865/896453128185081896/unknown.png')
-            emb.set_footer(text=ctx.author,icon_url=ctx.author.avatar_url)
-            await ctx.send(embed=emb)
+            await perms_error(ctx)
+            print(f"{Fore.LIGHTMAGENTA_EX}[{datetime.now()}] [E] [CMDERR] - User {ctx.author} tried to set SC without permissions{Style.RESET_ALL}")
         if isinstance(error, commands.MemberNotFound):
-            emb = discord.Embed(
-                title='Гражданин не обнаружен!',
-                description='Ну и ну! Бот не смочь найти гражданин для установка социальный кредит!',
-                color=0xff0000
-            )
-            emb.set_image(url='https://media.discordapp.net/attachments/883779765415337995/896458794886918225/unknown.png')
-            emb.set_footer(text=ctx.author,icon_url=ctx.author.avatar_url)
-            await ctx.send(embed=emb)
+            await member_not_found("установка")
 
+            print(f"{Fore.LIGHTMAGENTA_EX}[{datetime.now()}] [E] [CMDERR] - User {ctx.author} tried to set SC to unknown person.{Style.RESET_ALL}")
 
 def setup(bot):
     bot.add_cog(credit(bot))

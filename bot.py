@@ -3,42 +3,34 @@ from discord import colour
 from discord.ext import commands
 from datetime import datetime
 from colorama import init, Style, Back, Fore
-import traceback
+from cogs.credit import credit
+
+save = credit.save
 init()
 
-string= "-> Python Core " + sys.version + "\n"
-if sys.platform in ["win32", "cygwin"]:
-    platform = "Windows "
-    ver = sys.getwindowsversion()
-    platform += f"{ver.major}(.{ver.minor}) build {ver.build}"
-    string+= f"-> Platform: {platform} \n"
-    del platform
-impl = sys.implementation
-impl = f"{impl.name}/Tag: {impl.cache_tag}"
-string += f"-> Implementation: {impl} \n"
-string += f"-> Core C API Version: {sys.api_version}"
-print(f'{Fore.LIGHTGREEN_EX}{Style.BRIGHT}[{datetime.now()}] [DEBINF] - Debug info: {string}{Style.RESET_ALL}')
-del string, impl, ver
+from functions import debug_info, redefine_std, backup
+# redefine_std()
+debug_info()
 
 if not os.path.isdir("backup"): os.mkdir("backup")
 if not os.path.isfile("credit.json"): 
     with open("credit.json", "w") as file: file.write("{}") 
+with open("env.json", encoding="utf-8") as file: conf = json.load(file)
+backup()
+
+
 
 # async with ctx.channel.typing():
 
 bot = commands.Bot(command_prefix='sc.', owner_ids=[528606316432719908,453167201780760577])
-TOKEN = 'ODk1Njg4MTIxMjg1NTA5MTUx.YV8MkQ.RgbU4oGvZHmVv1onv15DS61SDfM'
+TOKEN = conf["token"]
 
 # ======
 # ЗАПУСК
 # ======
 bot.remove_command("help")
 
-backup = os.path.join("backup", datetime.now().isoformat().replace(":", "."))
-os.mkdir(backup)
-shutil.copyfile("credit.json", os.path.join(backup, "credit.json"))
-print(f'{Fore.LIGHTGREEN_EX}[{datetime.now()}] [BACKUP] - Backed up database to "{backup}"!{Style.RESET_ALL}')
-del backup
+
 
 with open("credit.json", "r", encoding="utf-8") as file:
     db = json.load(file)
@@ -52,15 +44,16 @@ def save():
 async def on_command_error(ctx, error):
     blacklist = ["MissingPermissions", "MemberNotFound"] # Расизм, расия)
     if type(error).__name__ in blacklist: return
-    print(f'{Fore.RED}[{datetime.now()}] [ERRMSG] - Error Raised! More info below:{Style.RESET_ALL}')
+    print(f'{Fore.RED}[{datetime.now()}] [C] [ERRMSG] - Error Raised! More info below:{Style.RESET_ALL}')
     print(f"{Fore.LIGHTRED_EX}-> {error}{Style.RESET_ALL}")
 
 @bot.event
 async def on_ready():
     stream = discord.Streaming(platform='Sex',name='sc.',game='Social Credit',url='https://clmty.xyz/')
     await bot.change_presence(status=discord.Status.idle, activity=stream)
-    print(f'{Fore.GREEN}[{datetime.now()}] [CLIENT] - Launched.{Style.RESET_ALL}')
-    bot.load_extension('cogs.credit')
+    print(f'{Fore.GREEN}[{datetime.now()}] [I] [CLIENT] - Launched.{Style.RESET_ALL}')
+    bot.load_extension("cogs.credit")
+    
 
 # =======
 # КОМАНДЫ
@@ -81,13 +74,34 @@ async def ping(ctx):
     )
     await ctx.send(embed=emb)
 
+@bot.command(aliases=["quit", 'logout', 'выйти', 'выключить', 'вырубить', 'poweroff'])
+async def logoff(ctx):
+    if ownercheck(ctx.author.id):
+        await ctx.reply("Выключаюсь...")
+
+        print(f"{Fore.LIGHTCYAN_EX}[{datetime.now()}] [I] [COMMND] - 'logoff' command executed by {ctx.author}.{Style.RESET_ALL}")
+        backup()
+        if 'credit' in bot.cogs: 
+            bot.cogs['credit'].save()
+        print(f"{Fore.LIGHTCYAN_EX}[{datetime.now()}] [I] [COMMND] - Saved and backed up database to do safe logout.{Style.RESET_ALL}")
+        await bot.close()
+
+        print(f"{Fore.LIGHTCYAN_EX}[{datetime.now()}] [I] [CLIENT] - Logged out.{Style.RESET_ALL}")
+        sys.exit()
+
+
+
 @bot.command()
 async def reload(ctx):
     if ownercheck(ctx.author.id):
-        bot.unload_extension('cogs.credit')
+        if 'cogs.credit' in bot.extensions:
+            bot.unload_extension('cogs.credit')
+        else:
+            print(f'{Fore.YELLOW}[{datetime.now()}] [W] [RELOAD] - Is cogs.credit loaded?!{Style.RESET_ALL}')
         bot.load_extension('cogs.credit')
         await ctx.send('Бот перезагружен!')
-        print(f'{Fore.LIGHTYELLOW_EX}[{datetime.now()}] [RELOAD] - Reloaded by {ctx.author}.{Style.RESET_ALL}')
+        print(f'{Fore.LIGHTYELLOW_EX}[{datetime.now()}] [I] [RELOAD] - Reloaded by {ctx.author}.{Style.RESET_ALL}')
 
 # ТОКЕН
+
 bot.run(TOKEN)
