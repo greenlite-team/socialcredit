@@ -9,3 +9,8 @@
 [bot.py] Added logout #Krutos
 [env.json] Add enviroment file. #Krutos
 [functions.py] Added RAM info into Debug info. #Krutos
+[bot.py] Added universal cog loader. #Krutos
+[functions.py] [bot.py] Add version check #Krutos
+[env.json] Change keys #Krutos
+[bot.py] Now handle CommandNotFound #Krutos
+[credit.py] Add limits to social credit #Calamity
