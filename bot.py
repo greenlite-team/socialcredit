@@ -49,7 +49,7 @@ def save():
 
 @bot.event
 async def on_command_error(ctx, error):
-    blacklist = ["MissingPermissions", "MemberNotFound", "CommandNotFound"] # Расизм, расия)
+    blacklist = ["MissingPermissions", "MemberNotFound", "CommandNotFound", "CommandOnCooldown"] # Расизм, расия)
     if isinstance(error, discord.ext.commands.CommandNotFound):
         err = str(error).replace("Command \"", "").replace("\" is not found", "")
         emb = discord.Embed(

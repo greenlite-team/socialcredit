@@ -1,42 +1,12 @@
 {
-    "528606316432719908": {
-        "username": "Calamity#3483",
-        "credit": 2200
-    },
-    "453167201780760577": {
-        "username": "KrutosX#3599",
-        "credit": 2000
-    },
-    "493365552555753493": {
-        "username": "irwgotbanned#4768",
-        "credit": 1200
-    },
-    "895688121285509151": {
-        "username": "Social Credit#2412",
-        "credit": 2000
-    },
-    "810871709770973254": {
-        "username": "FloppaTesting#9682",
-        "credit": 1000
-    },
-    "498166864896065537": {
-        "username": "irw#8135",
-        "credit": 1000
-    },
-    "764767856595828757": {
-        "username": "greenlite#1085",
-        "credit": 1000
-    },
-    "681096280193368073": {
-        "username": "Flame#3471",
-        "credit": 1000
-    },
-    "829779540359643188": {
-        "username": "eh#3717",
-        "credit": 1000
-    },
-    "566848366999502859": {
-        "username": "gorodmi#7310",
-        "credit": 1100
+    "883778577609412660": {
+        "453167201780760577": {
+            "username": "KrutosX#3599",
+            "credit": 2000
+        },
+        "528606316432719908": {
+            "username": "Calamity#3483",
+            "credit": 2000
+        }
     }
 }

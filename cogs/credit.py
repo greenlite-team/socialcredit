@@ -30,48 +30,65 @@ class credit(commands.Cog): # я не ебу - а ты еби-
             json.dump(self.bot.db, file, indent=4)
             print(f"{Fore.LIGHTBLUE_EX}[{datetime.now()}] [I] [DATABS] - Saved.{Style.RESET_ALL}")
 
-    def add_user(self, user):
-        id = str(user.id)
-        if not id in self.bot.db: # Если id не в DB
-            self.bot.db.update({id: {"username": f"{user.name}#{user.discriminator}", "credit": 1000}}) 
+    def load(self):
+        with open("credit.json", "r", encoding="utf-8") as file:
+            self.bot.db = json.load(file)
+            print(f"{Fore.LIGHTBLUE_EX}[{datetime.now()}] [I] [DATABS] - Loaded.{Style.RESET_ALL}")
 
-    def check_user(self, user):
+    def add_user(self, user, guild):
         id = str(user.id)
-        if not id in self.bot.db: self.add_user(user)
-        self.bot.db[id]["username"] = f"{user.name}#{user.discriminator}"
-        return self.bot.db[id] # {"username": "Каламя :3#3483", "credit": 1340}
+        id2 = str(guild.id)
+        if not id2 in self.bot.db:
+            self.bot.db.update({id2: {id: {"username": f"{user.name}#{user.discriminator}", "credit": 1000}}})
+        else:
+            if not id in self.bot.db[id2]: # Если id не в DB
+                self.bot.db[id2].update({id: {"username": f"{user.name}#{user.discriminator}", "credit": 1000}})
+
+    def check_user(self, user, guild):
+        id = str(user.id)
+        id2 = str(guild.id)
+        if not id2 in self.bot.db: self.add_user(user, guild)
+        elif not id in self.bot.db[id2]: self.add_user(user, guild)
+        self.bot.db[id2][id]["username"] = f"{user.name}#{user.discriminator}"
+        return self.bot.db[id2][id] # {"username": "Каламя :3#3483", "credit": 1340}
     
-    def add_to_user(self, user, num: int):
+    def add_to_user(self, user, guild, num: int):
         id = str(user.id)
-        if not id in self.bot.db: self.add_user(user)
-        self.bot.db[id]["username"] = f"{user.name}#{user.discriminator}"
+        id2 = str(guild.id)
+        if not id2 in self.bot.db: self.add_user(user, guild)
+        elif not id in self.bot.db[id2]: self.add_user(user, guild)
+        self.bot.db[id2][id]["username"] = f"{user.name}#{user.discriminator}"
         if num < 0: raise ValueError
         if num > 2000: num = 2000 # лимит добавления ёпт
-        if self.bot.db[id]["credit"] + num > 100000: 
-            self.bot.db[id]["credit"] = 100000 # Чел, двести iq
+        if self.bot.db[id2][id]["credit"] + num > 100000: 
+            self.bot.db[id2][id]["credit"] = 100000 # Чел, двести iq
             # 1000 - лимит, 900 - было, 200 - добавляем, 100 - надо вернуть
             # 900 + 200 - 1000 = 100
         else:
-            self.bot.db[id]["credit"] += num
-        return self.bot.db[id]
+            self.bot.db[id2][id]["credit"] += num
+        return self.bot.db[id2][id]
 
-    def remove_from_user(self, user, num: int):
+    def remove_from_user(self, user, guild, num: int):
         id = str(user.id)
-        if not id in self.bot.db: self.add_user(user)
-        self.bot.db[id]["username"] = f"{user.name}#{user.discriminator}"
+        id2 = str(guild.id)
+        if not id2 in self.bot.db: self.add_user(user, guild)
+        elif not id in self.bot.db[id2]: self.add_user(user, guild)
+        self.bot.db[id2][id]["username"] = f"{user.name}#{user.discriminator}"
         if num < 0: num = num-num-num # делает из отрицательного числа положительное
         if num > 2000: num = 2000
-        self.bot.db[id]["credit"] -= num
-        return self.bot.db[id]
+        self.bot.db[id2][id]["credit"] -= num
+        return self.bot.db[id2][id]
 
-    def set_to_user(self, user, num: int):
+    def set_to_user(self, user, guild, num: int):
         id = str(user.id)
-        if not id in self.bot.db: self.add_user(user)
-        self.bot.db[id]["username"] = f"{user.name}#{user.discriminator}"
+        id2 = str(guild.id)
+        if not id2 in self.bot.db: self.add_user(user, guild)
+        elif not id in self.bot.db[id2]: self.add_user(user, guild)
+        self.bot.db[id2][id]["username"] = f"{user.name}#{user.discriminator}"
         if num > 100000: num = 100000
         if num < -100000: num = -100000
-        self.bot.db[id]["credit"] = num
-        return self.bot.db[id]
+        self.bot.db[id2][id]["credit"] = num
+        return self.bot.db[id2][id]
 
     def owner_check(self, id):
         if id in [528606316432719908,453167201780760577]:
@@ -82,6 +99,17 @@ class credit(commands.Cog): # я не ебу - а ты еби-
     # ===========
     # = КОМАНДЫ =
     # ===========
+
+    @commands.command(name="load", aliases=[])
+    async def load_cmd(self, ctx):
+        if self.owner_check(ctx.author.id):
+            self.load()
+            emb = discord.Embed(
+                        title='Датабаза загружена',
+                        color=ctx.guild.me.color
+            )
+            await ctx.send(embed=emb)
+            print(f"{Fore.LIGHTCYAN_EX}[{datetime.now()}] [I] [COMMND] - User {ctx.author} loaded database from file.{Style.RESET_ALL}")
 
     @commands.command(name="save", aliases=[])
     async def save_cmd(self, ctx):
@@ -111,7 +139,7 @@ class credit(commands.Cog): # я не ебу - а ты еби-
             user = ctx.author
         emb = discord.Embed(
             title='Социальный Кредит',
-            description=f"Социальный кредит {str(user)[:-5]}: `{self.check_user(user)['credit']}`",
+            description=f"Социальный кредит {str(user)[:-5]}: `{self.check_user(user, ctx.guild)['credit']}`",
             color=ctx.guild.me.color
         )
         emb.set_thumbnail(url=ctx.guild.me.avatar_url)
@@ -124,7 +152,10 @@ class credit(commands.Cog): # я не ебу - а ты еби-
     async def add(self, ctx, user: Union[discord.Member, int] = None, credit = 0):
         credittrigger = False; limittrigger = False
         if type(user).__name__ == "int":
-            user = await self.bot.fetch_user(user)
+            try:
+                user = await self.bot.fetch_user(user)
+            except:
+                raise discord.ext.commands.MemberNotFound(user)
         if user == None:
             nouseremb = discord.Embed(
                 title='Ошибка!',
@@ -135,7 +166,7 @@ class credit(commands.Cog): # я не ебу - а ты еби-
             await ctx.reply(embed=nouseremb)
             print(f"{Fore.LIGHTRED_EX}[{datetime.now()}] [E] [CMDERR] - User {ctx.author} tried to add SC but didn't include a user.{Style.RESET_ALL}")
         elif user == ctx.author and not self.bot.ownercheck(ctx.author.id):
-            userdata = self.remove_from_user(ctx.author, 10)
+            userdata = self.remove_from_user(ctx.author, ctx.guild, 10)
             selfemb = discord.Embed(
                 title='Ошибка!',
                 description='Вам запрещено изменять себе социальный кредит!\nЗа попытку Китай Республика отнимать у вас 10 социальный кредит!',
@@ -147,10 +178,10 @@ class credit(commands.Cog): # я не ебу - а ты еби-
             print(f"{Fore.LIGHTMAGENTA_EX}[{datetime.now()}] [E] [CMDERR] - User {ctx.author} tried to give himself SC, so we removed 10 SC from him.{Style.RESET_ALL}")
         else:
             try:
-                oldcredit = self.check_user(user)['credit']
+                oldcredit = self.check_user(user, ctx.guild)['credit']
                 if credit > 2000: credit = 2000; credittrigger = True
                 if oldcredit + credit > 100000: credit = (oldcredit + credit) - 100000; limittrigger = True # я отошёл, сделай прикол
-                userdata = self.add_to_user(user, credit)
+                userdata = self.add_to_user(user, ctx.guild, credit)
                 emb = discord.Embed(
                     title=f'Добавление кредита {str(user)[:-5]}',
                     description=f'Добавил кредит {str(user)[:-5]}: `{credit}`\nТеперь его кредит равен: `{userdata["credit"]}`',
@@ -186,7 +217,10 @@ class credit(commands.Cog): # я не ебу - а ты еби-
     async def remove(self, ctx, user: Union[discord.Member, int] = None, credit = 0):
         credittrigger = False
         if type(user).__name__ == "int":
-            user = await self.bot.fetch_user(user)
+            try:
+                user = await self.bot.fetch_user(user)
+            except:
+                raise discord.ext.commands.MemberNotFound(user)
         if user == None:
             nouseremb = discord.Embed(
                 title='Ошибка!',
@@ -197,7 +231,7 @@ class credit(commands.Cog): # я не ебу - а ты еби-
             await ctx.reply(embed=nouseremb)
             print(f"{Fore.LIGHTRED_EX}[{datetime.now()}] [E] [CMDERR] - User {ctx.author} tried to remove SC but didn't include a user.{Style.RESET_ALL}")
         elif user == ctx.author and not self.bot.ownercheck(ctx.author.id):
-            userdata = self.remove_from_user(ctx.author, 10)
+            userdata = self.remove_from_user(ctx.author, ctx.guild, 10)
             selfemb = discord.Embed(
                 title='Ошибка!',
                 description='Вам запрещено изменять себе социальный кредит!\nЗа попытку Китай Республика отнимать у вас 10 социальный кредит!',
@@ -208,10 +242,10 @@ class credit(commands.Cog): # я не ебу - а ты еби-
             await ctx.reply(embed=selfemb)
             print(f"{Fore.LIGHTMAGENTA_EX}[{datetime.now()}] [E] [CMDERR] - User {ctx.author} tried to remove himself SC, so we removed 10 SC from him.{Style.RESET_ALL}")
         else:
-            oldcredit = self.check_user(user)['credit']
+            oldcredit = self.check_user(user, ctx.guild)['credit']
             if credit < -2000: credit = 2000; credittrigger = True
             if credit > 2000: credit = 2000; credittrigger = True
-            userdata = self.remove_from_user(user, credit)
+            userdata = self.remove_from_user(user, ctx.guild, credit)
             emb = discord.Embed(
                 title=f'Убирание кредита {str(user)[:-5]}',
                 description=f'Убрал кредит {str(user)[:-5]}: `{credit}`\nТеперь его кредит равен: `{userdata["credit"]}`',
@@ -231,7 +265,10 @@ class credit(commands.Cog): # я не ебу - а ты еби-
     @commands.command(aliases=['setcredit','set_credit','setcr','установить','s','ус'])
     async def set(self, ctx, user: Union[discord.Member, int] = None, credit = 0):
         if type(user).__name__ == "int":
-            user = await self.bot.fetch_user(user)
+            try:
+                user = await self.bot.fetch_user(user)
+            except:
+                raise discord.ext.commands.MemberNotFound(user)
         credittrigger = False
         if user == None:
             nouseremb = discord.Embed(
@@ -243,7 +280,7 @@ class credit(commands.Cog): # я не ебу - а ты еби-
             await ctx.reply(embed=nouseremb)
             print(f"{Fore.LIGHTRED_EX}[{datetime.now()}] [E] [CMDERR] - User {ctx.author} tried to remove SC but didn't include a user.{Style.RESET_ALL}")
         elif user == ctx.author and not self.bot.ownercheck(ctx.author.id):
-            userdata = self.remove_from_user(ctx.author, 10)
+            userdata = self.remove_from_user(ctx.author, ctx.guild, 10)
             selfemb = discord.Embed(
                 title='Ошибка!',
                 description='Вам запрещено изменять себе социальный кредит!\nЗа попытку Китай Республика отнимать у вас 10 социальный кредит!',
@@ -256,8 +293,8 @@ class credit(commands.Cog): # я не ебу - а ты еби-
         else:
             if credit > 100000: credit = 100000; credittrigger = True
             if credit < -100000: credit = -100000; credittrigger = True
-            oldcredit = self.check_user(user)['credit']
-            userdata = self.set_to_user(user, credit)
+            oldcredit = self.check_user(user, ctx.guild)['credit']
+            userdata = self.set_to_user(user, ctx.guild, credit)
             emb = discord.Embed(
                 title=f'Установка кредита {str(user)[:-5]}',
                 description=f'Установлен кредит {str(user)[:-5]}: `{credit}`',

@@ -9,6 +9,7 @@ class Utils(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.cooldown(rate=1, per=10)
     @commands.command()
     async def ping(self, ctx):
         emb = discord.Embed(
@@ -16,7 +17,7 @@ class Utils(commands.Cog):
             description=f'Пинг: {int(round(self.bot.latency, 4) * 1000)}',
             color=ctx.guild.me.color
         )
-        await ctx.send(embed=emb)
+        await ctx.reply(embed=emb)
         print(f"{Fore.LIGHTCYAN_EX}[{datetime.now()}] [I] [COMMND] - 'ping' command executed by {ctx.author}.{Style.RESET_ALL}")
 
     @commands.command()
@@ -76,6 +77,18 @@ class Utils(commands.Cog):
                     self.bot.load_extension(f'cogs.{i[:-3]}')
             await ctx.send('Бот перезагружен!')
             print(f'{Fore.LIGHTYELLOW_EX}[{datetime.now()}] [I] [RELOAD] - Reloaded by {ctx.author}.{Style.RESET_ALL}')
+    
+    @ping.error
+    async def on_ping_error(self, ctx, error):
+        if isinstance(error, commands.CommandOnCooldown):
+            emb = discord.Embed(
+                title='Вы заморожены!',
+                description=f'Попробуйте выполнить команду примерно через {int(error.retry_after)} секунд!',
+                color=0xff0000
+            )
+            emb.set_footer(text=ctx.author, icon_url=ctx.author.avatar_url)
+
+            await ctx.reply(embed=emb)
 
 def setup(bot):
     bot.add_cog(Utils(bot))
