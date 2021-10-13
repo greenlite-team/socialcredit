@@ -9,6 +9,29 @@ class Utils(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.Cog.listener()
+    async def on_guild_join(self, guild):
+        print(f"{Fore.LIGHTGREEN_EX}[{datetime.now()}] [I] [+GUILD] - Bot joined a new guild: '{guild.name}'. Member count: '{guild.member_count}'.{Style.RESET_ALL}")
+        emb = discord.Embed(
+            title='Спасибо за добавление!',
+            description="Я есть Социальный Кредит бот разработанный `Calamity#3483` и `KrutosX#3599` совместно с Коммунистическая Партия Китай.",
+            color=guild.me.color
+        )
+        emb.add_field(
+            name="Что я уметь?",
+            value="Данный бот уметь добавление/отнимание/установка Социальный Кредит, и Китай Пропаганда (молчание!).\nУзнать больше: `sc.help`",
+            inline=False
+        )
+        for i in guild.text_channels:
+            perm = i.permissions_for(guild.me)
+            if perm.send_messages:
+                await i.send(embed=emb)
+                break
+
+    @commands.Cog.listener()
+    async def on_guild_leave(self, guild):
+        print(f"{Fore.LIGHTGREEN_EX}[{datetime.now()}] [I] [-GUILD] - Bot leaved guild: '{guild.name}'. Member count: '{guild.member_count}'.{Style.RESET_ALL}")
+    
     @commands.cooldown(rate=1, per=10)
     @commands.command()
     async def ping(self, ctx):

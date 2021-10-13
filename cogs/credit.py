@@ -39,17 +39,19 @@ class credit(commands.Cog): # я не ебу - а ты еби-
         id = str(user.id)
         id2 = str(guild.id)
         if not id2 in self.bot.db:
-            self.bot.db.update({id2: {id: {"username": f"{user.name}#{user.discriminator}", "credit": 1000}}})
+            self.bot.db.update({id2: {id: {"username": f"{user}", "credit": 1000}}})
+            print(f"{Fore.LIGHTBLUE_EX}[{datetime.now()}] [I] [DATABS] - Guild {guild.name} added to DB.{Style.RESET_ALL}")
         else:
             if not id in self.bot.db[id2]: # Если id не в DB
-                self.bot.db[id2].update({id: {"username": f"{user.name}#{user.discriminator}", "credit": 1000}})
+                self.bot.db[id2].update({id: {"username": f"{user}", "credit": 1000}})
+                print(f"{Fore.LIGHTBLUE_EX}[{datetime.now()}] [I] [DATABS] - User {user} loaded into DB at guild {guild.name}.{Style.RESET_ALL}")
 
     def check_user(self, user, guild):
         id = str(user.id)
         id2 = str(guild.id)
         if not id2 in self.bot.db: self.add_user(user, guild)
         elif not id in self.bot.db[id2]: self.add_user(user, guild)
-        self.bot.db[id2][id]["username"] = f"{user.name}#{user.discriminator}"
+        self.bot.db[id2][id]["username"] = f"{user}"
         return self.bot.db[id2][id] # {"username": "Каламя :3#3483", "credit": 1340}
     
     def add_to_user(self, user, guild, num: int):
@@ -57,7 +59,7 @@ class credit(commands.Cog): # я не ебу - а ты еби-
         id2 = str(guild.id)
         if not id2 in self.bot.db: self.add_user(user, guild)
         elif not id in self.bot.db[id2]: self.add_user(user, guild)
-        self.bot.db[id2][id]["username"] = f"{user.name}#{user.discriminator}"
+        self.bot.db[id2][id]["username"] = f"{user}"
         if num < 0: raise ValueError
         if num > 2000: num = 2000 # лимит добавления ёпт
         if self.bot.db[id2][id]["credit"] + num > 100000: 
@@ -73,7 +75,7 @@ class credit(commands.Cog): # я не ебу - а ты еби-
         id2 = str(guild.id)
         if not id2 in self.bot.db: self.add_user(user, guild)
         elif not id in self.bot.db[id2]: self.add_user(user, guild)
-        self.bot.db[id2][id]["username"] = f"{user.name}#{user.discriminator}"
+        self.bot.db[id2][id]["username"] = f"{user}"
         if num < 0: num = num-num-num # делает из отрицательного числа положительное
         if num > 2000: num = 2000
         self.bot.db[id2][id]["credit"] -= num
@@ -84,11 +86,23 @@ class credit(commands.Cog): # я не ебу - а ты еби-
         id2 = str(guild.id)
         if not id2 in self.bot.db: self.add_user(user, guild)
         elif not id in self.bot.db[id2]: self.add_user(user, guild)
-        self.bot.db[id2][id]["username"] = f"{user.name}#{user.discriminator}"
+        self.bot.db[id2][id]["username"] = f"{user}"
         if num > 100000: num = 100000
         if num < -100000: num = -100000
         self.bot.db[id2][id]["credit"] = num
         return self.bot.db[id2][id]
+
+    def rank(self, num: int):
+        if   num >= 50000: return "X"
+        elif num >= 3000:  return "S+"
+        elif num >= 1500:  return "S"
+        elif num >= 1250:  return "A"
+        elif num >= 1000:  return "B"
+        elif num >= 950:   return "C"
+        elif num >= 900:   return "D"
+        elif num >= 850:   return "E"
+        elif num >= 0:     return "F"
+        else:              return "Z"
 
     def owner_check(self, id):
         if id in [528606316432719908,453167201780760577]:
@@ -137,9 +151,20 @@ class credit(commands.Cog): # я не ебу - а ты еби-
     async def credit(self, ctx, user: discord.Member = None):
         if user == None:
             user = ctx.author
+        rank = self.rank(self.check_user(user, ctx.guild)['credit'])
+        if rank == "X":    motd = "Так держать! Гражданин молодец, получать 4 миска рис и 2 кошка жена!" # Каламити долбаеб блять, кто так костылит))
+        elif rank == "S+": motd = "Прекрасно! Вы получать рацион в виде 3 миска рис, так держать!"       # ну я  
+        elif rank == "S":  motd = "Очень хорошо! Вы получать 2 миска рис и кошка жена! За такое поколение гордость!"   
+        elif rank == "A":  motd = "Отлично! Вы получать полтора миска рис от Компартии! Продолжение повышать кредит!"
+        elif rank == "B":  motd = "Хорошо! У вас нормальный социальный кредит! Желание вам повышение кредит для второй миска рис!"
+        elif rank == "C":  motd = "Мда! Партия давать вам пол миска рис! За такой поколение стыд! Желаем вам повышение кредит!"
+        elif rank == "D":  motd = "Плохо! Партия оставить вам чашка рис в день! Поднимать социальный кредит, гражданин!"
+        elif rank == "E":  motd = "Очень плохо! Партия отбирать у вас рис! Пытаться поднять социальный кредит!"
+        elif rank == "F":  motd = "Ну и ну! У вас слишком малый социальный кредит! Ваш путёвка в Санаторий назначить через 14 дней!"
+        elif rank == "Z":  motd = "Ужасно! Партия отправлять вас на расстрел и отнимать у вас семья и дети!"
         emb = discord.Embed(
             title='Социальный Кредит',
-            description=f"Социальный кредит {str(user)[:-5]}: `{self.check_user(user, ctx.guild)['credit']}`",
+            description=f"Социальный кредит {str(user)[:-5]}: `{self.check_user(user, ctx.guild)['credit']}`\nРанг Гражданина: `{rank}`\n\n{motd}",
             color=ctx.guild.me.color
         )
         emb.set_thumbnail(url=ctx.guild.me.avatar_url)
@@ -309,6 +334,42 @@ class credit(commands.Cog): # я не ебу - а ты еби-
             emb.set_footer(text=f'Установлено юзером {ctx.author}', icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=emb)
             print(f"{Fore.LIGHTCYAN_EX}[{datetime.now()}] [I] [COMMND] - User {ctx.author} set {credit} credit for {user}. ({oldcredit} > {userdata['credit']}){Style.RESET_ALL}")
+
+    @commands.command(aliases=['cmds','cmd','помощь','h','п'])
+    async def help(self, ctx):
+        emb = discord.Embed(
+            title = 'Помощь/Команды',
+            description = 'Команды Китая Компартия бота (Префикс - `sc.`):',
+            color = ctx.guild.me.color
+        )
+        emb.add_field(
+            name='Управление Кредит',
+            value=
+"""
+`sc.add/добавить/plus/a/доб <юзер> <кредит>` - Добавить Социальный Кредит гражданину
+`sc.remove/убрать/minus/rm/r/d/уб <юзер> <кредит>` - Отнять Социальный Кредит гражданина
+`sc.set/установить/s/ус <юзер> <кредит>` - Установить Социальный Кредит гражданина  
+""", inline=False
+        )
+        emb.add_field(
+            name='Утилиты',
+            value=
+"""
+`sc.ping` - Проверить пинг бот
+`sc.help/cmds/h/помощь/п` - Показать список команды
+`sc.version` - Узнать версия мягкий техника бот
+""", inline=False
+        )
+        emb.add_field(
+            name='Пропаганда',
+            value=
+"""
+`sc.tanks/tiananmen/тяньаньмэнь/танки/площадь/square/протест/1989` - Что происходить на Площадь Тяньаньмэнь 4 июня 1989 (ничего)
+""", inline=False
+        )
+        # emb.set_thumbnail(url=ctx.guild.me.avatar_url)
+        emb.set_footer(text=ctx.author, icon_url=ctx.author.avatar_url)
+        await ctx.reply(embed=emb)
 
 # ==========
 # = ОШИБКИ =

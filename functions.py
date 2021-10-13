@@ -58,7 +58,14 @@ def redefine_std():
     sys.stdout = STD(date)
     sys.stderr = STDerr(date)
 
-    
+def release_info(conf):
+    string= "\n -> Bot in Release mode. Version: "+ conf["ro.bot.version"] +"\n -> Python Core " + sys.version + "\n"
+    impl = sys.implementation
+    impl = f"{impl.name}/Tag: {impl.cache_tag}"
+    string += f" -> Implementation: {impl}"
+
+    print(f'{Fore.LIGHTGREEN_EX}{Style.BRIGHT}[{datetime.now()}] [D] [RELINF] - Release info: {string}{Style.RESET_ALL}')
+    del string, impl
 
 def debug_info(conf):
     def count_percent(percent, all):

@@ -4,7 +4,7 @@ from discord.ext import commands
 from datetime import datetime
 from colorama import init, Style, Back, Fore
 from cogs.credit import credit
-from functions import debug_info, redefine_std, backup, version_check
+from functions import debug_info, redefine_std, backup, version_check, release_info
 from copy import copy
 with open("env.json", encoding="utf-8") as file: conf = json.load(file)
 init()
@@ -16,6 +16,8 @@ if conf["ro.bot.logd"]:
 
 if conf["ro.build.type"][0] == "debug":
     debug_info(conf)
+elif conf["ro.build.type"][0] == "release":
+    release_info(conf)
 
 if not os.path.isdir("backup"): os.mkdir("backup")
 if not os.path.isfile("credit.json"): 
