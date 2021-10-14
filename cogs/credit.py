@@ -379,7 +379,12 @@ class credit(commands.Cog): # я не ебу - а ты еби-
     @add.error
     async def add_error(self, ctx, error):
         if isinstance(error, commands.MissingPermissions):
-            await perms_error(ctx)
+            if self.bot.ownercheck(ctx.author.id):
+                print(f"{Fore.LIGHTMAGENTA_EX}[{datetime.now()}] [E] [CMDERR] - User {ctx.author} tried to set SC without permissions, but he is owner, so reexec command with perms ignore..{Style.RESET_ALL}")
+                await ctx.reinvoke()
+                return
+            else:
+                await perms_error(ctx)
             print(f"{Fore.LIGHTMAGENTA_EX}[{datetime.now()}] [E] [CMDERR] - User {ctx.author} tried to add SC without permissions.{Style.RESET_ALL}")
 
         if isinstance(error, commands.MemberNotFound):
@@ -390,7 +395,12 @@ class credit(commands.Cog): # я не ебу - а ты еби-
     @remove.error
     async def remove_error(self, ctx, error):
         if isinstance(error, commands.MissingPermissions):
-            await perms_error(ctx)
+            if self.bot.ownercheck(ctx.author.id):
+                print(f"{Fore.LIGHTMAGENTA_EX}[{datetime.now()}] [E] [CMDERR] - User {ctx.author} tried to set SC without permissions, but he is owner, so reexec command with perms ignore..{Style.RESET_ALL}")
+                await ctx.reinvoke()
+                return
+            else:
+                await perms_error(ctx)
             print(f"{Fore.LIGHTMAGENTA_EX}[{datetime.now()}] [E] [CMDERR] - User {ctx.author} tried to remove SC without permissions.{Style.RESET_ALL}")
         if isinstance(error, commands.MemberNotFound):
             await member_not_found(ctx, "отнимание")
@@ -400,10 +410,12 @@ class credit(commands.Cog): # я не ебу - а ты еби-
     @set.error
     async def set_error(self, ctx, error):
         if isinstance(error, commands.MissingPermissions):
-            #if self.bot.ownercheck(ctx.author.id):
-            #    await self.bot.invoke(ctx)
-            #else:
-            await perms_error(ctx)
+            if self.bot.ownercheck(ctx.author.id):
+                print(f"{Fore.LIGHTMAGENTA_EX}[{datetime.now()}] [E] [CMDERR] - User {ctx.author} tried to set SC without permissions, but he is owner, so reexec command with perms ignore..{Style.RESET_ALL}")
+                await ctx.reinvoke()
+                return
+            else:
+                await perms_error(ctx)
             print(f"{Fore.LIGHTMAGENTA_EX}[{datetime.now()}] [E] [CMDERR] - User {ctx.author} tried to set SC without permissions.{Style.RESET_ALL}")
         if isinstance(error, commands.MemberNotFound):
             await member_not_found(ctx, "установка")
