@@ -34,8 +34,6 @@ TOKEN = conf["vendor.token"]
 bot.conf = copy(conf)
 del bot.conf["vendor.token"]
 
-TOKEN = "ODk4MDcyMzIzODAwODUwNDcz.YWe5Bw.7fpJOaawFmgL54sQYTHknH7Bc9Y"
-
 # ======
 # ЗАПУСК
 # ======
