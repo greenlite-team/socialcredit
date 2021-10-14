@@ -15,7 +15,7 @@ class Utils(commands.Cog):
         emb = discord.Embed(
             title='Спасибо за добавление!',
             description="Я есть Социальный Кредит бот разработанный `Calamity#3483` и `KrutosX#3599` совместно с Коммунистическая Партия Китай.",
-            color=guild.me.color
+            color=0xb8493c
         )
         emb.add_field(
             name="Что я уметь?",
@@ -29,7 +29,7 @@ class Utils(commands.Cog):
                 break
 
     @commands.Cog.listener()
-    async def on_guild_leave(self, guild):
+    async def on_guild_remove(self, guild):
         print(f"{Fore.LIGHTGREEN_EX}[{datetime.now()}] [I] [-GUILD] - Bot leaved guild: '{guild.name}'. Member count: '{guild.member_count}'.{Style.RESET_ALL}")
     
     @commands.cooldown(rate=1, per=10)

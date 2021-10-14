@@ -14,5 +14,6 @@
 [env.json] Change keys #Krutos
 [bot.py] Now handle CommandNotFound #Krutos
 [credit.py] Add limits to social credit #Calamity
-[utils.py] Add cooldown to ping
-[credit.py] Add command to load db, sc is unique for any guild
+[utils.py] Add cooldown to ping # Krutos
+[credit.py] Add command to load db, sc is unique for any guild # Krutos
+[utils.py] Fixed guild leave.
