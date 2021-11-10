@@ -9,6 +9,7 @@ from copy import copy
 with open("env.json", encoding="utf-8") as file: conf = json.load(file)
 init()
 version_check(conf["ro.python.minimal"][0], conf["ro.python.minimal"][1])
+with open("token.json", encoding="utf-8") as file: token = json.load(file); TOKEN = token["vendor.token"]; del token
 
 if conf["ro.bot.logd"]:
     redefine_std()
@@ -30,9 +31,7 @@ backup()
 # async with ctx.channel.typing():
 
 bot = commands.Bot(command_prefix='sc.', owner_ids=[528606316432719908,453167201780760577])
-TOKEN = conf["vendor.token"]
 bot.conf = copy(conf)
-del bot.conf["vendor.token"]
 
 # ======
 # ЗАПУСК

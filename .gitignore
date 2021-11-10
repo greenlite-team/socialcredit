@@ -2,3 +2,5 @@ cogs/__pycache__/
 backup/
 __pycache__
 logs/
+token.json
+credit.json
