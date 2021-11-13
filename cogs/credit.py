@@ -128,6 +128,7 @@ class credit(commands.Cog): # я не ебу - а ты еби-
         if lang == "ENGLISH": lang = "EN"
         if lang == "RUSSIAN": lang = "RU"
         self.bot.db[gid]["lang"] = lang
+        self.save()
         return self.bot.db[gid]["lang"]
 
     def check_lang(self, guild):

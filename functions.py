@@ -81,7 +81,7 @@ def debug_info(conf):
         ver = sys.getwindowsversion()
         platform += f"{ver.major}(.{ver.minor}) build {ver.build}"
         string+= f" -> Platform: {platform} \n"
-        del platform
+        del platform, ver
     impl = sys.implementation
     impl = f"{impl.name}/Tag: {impl.cache_tag}"
     string += f" -> Implementation: {impl} \n"
@@ -97,7 +97,7 @@ def debug_info(conf):
     string += f" --> Python Mininal Version (ro.python.minimal): {conf['ro.python.minimal']}" 
 
     print(f'{Fore.LIGHTGREEN_EX}{Style.BRIGHT}[{datetime.now()}] [D] [DEBINF] - Debug info: {string}{Style.RESET_ALL}')
-    del string, impl, ver
+    del string, impl
 
 # ==========
 # = ОШИБКИ =
