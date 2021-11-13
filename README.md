@@ -20,9 +20,13 @@ A **discord.py** bot made by [Calamity](https://clmty.xyz) and [KrutosX](https:/
 Just in case: fill it like this:
 ```json
 {
-    
+
 }
 ```
+
+**THIS IS IMPORTANT: MAKE SURE THAT THE BOT ISN'T ON ANY SERVERS WHEN RESETTING THE DB. THIS WILL CAUSE A LOT OF PROBLEMS.**
+**THIS IS IMPORTANT: MAKE SURE THAT THE BOT ISN'T ON ANY SERVERS WHEN RESETTING THE DB. THIS WILL CAUSE A LOT OF PROBLEMS.**
+**THIS IS IMPORTANT: MAKE SURE THAT THE BOT ISN'T ON ANY SERVERS WHEN RESETTING THE DB. THIS WILL CAUSE A LOT OF PROBLEMS.**
 
 *in case of updating the bot: backup the credit.json file using `sc.backup`, then copy it back from `backup/timedate/credit.json`*
 
