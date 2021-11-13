@@ -26,7 +26,7 @@ backup()
 
 # async with ctx.channel.typing():
 
-bot = commands.Bot(command_prefix='scd.', owner_ids=[528606316432719908,453167201780760577])
+bot = commands.Bot(command_prefix='sc.', owner_ids=[528606316432719908,453167201780760577])
 bot.conf = copy(conf)
 
 # ======
