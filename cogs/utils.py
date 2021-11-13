@@ -1,26 +1,40 @@
-import discord, colorama, sys, os
+import discord, colorama, sys, os, json
 from datetime import datetime
 from colorama import Back, Fore, Style
 from discord.embeds import Embed
 from discord.ext import commands, tasks
 from functions import backup
+from time import sleep
 
 class Utils(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    def load(self):
+        with open("credit.json", "r", encoding="utf-8") as file:
+            self.bot.db = json.load(file)
+
+    def check_lang(self, guild):
+        self.load()
+        gid = str(guild.id)
+        return self.bot.db[gid]["lang"]
+
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
         print(f"{Fore.LIGHTGREEN_EX}[{datetime.now()}] [I] [+GUILD] - Bot joined a new guild: '{guild.name}'. Member count: '{guild.member_count}'.{Style.RESET_ALL}")
         emb = discord.Embed(
-            title='Спасибо за добавление!',
+            title=':wave: Здравствуйте!',
             description="Я есть Социальный Кредит бот разработанный `Calamity#3483` и `KrutosX#3599` совместно с Коммунистическая Партия Китай.",
             color=0xb8493c
         )
         emb.add_field(
-            name="Что я уметь?",
+            name=":key: Что я уметь?",
             value="Данный бот уметь добавление/отнимание/установка Социальный Кредит, и Китай Пропаганда (молчание!).\nУзнать больше: `sc.help`",
             inline=False
+        )
+        emb.add_field(
+            name=":flag_gb: English?",
+            value="Switch to the English language using `sc.lang EN`. (only availible for admins)"
         )
         for i in guild.text_channels:
             perm = i.permissions_for(guild.me)
@@ -30,33 +44,49 @@ class Utils(commands.Cog):
 
     @commands.Cog.listener()
     async def on_guild_remove(self, guild):
-        print(f"{Fore.LIGHTGREEN_EX}[{datetime.now()}] [I] [-GUILD] - Bot leaved guild: '{guild.name}'. Member count: '{guild.member_count}'.{Style.RESET_ALL}")
+        print(f"{Fore.LIGHTRED_EX}[{datetime.now()}] [I] [-GUILD] - Bot left guild: '{guild.name}'. Member count: '{guild.member_count}'.{Style.RESET_ALL}")
     
     @commands.cooldown(rate=1, per=10)
     @commands.command()
     async def ping(self, ctx):
-        emb = discord.Embed(
-            title='Понг!',
-            description=f'Пинг: {int(round(self.bot.latency, 4) * 1000)}',
-            color=ctx.guild.me.color
-        )
+        lang = self.check_lang(ctx.guild)
+        if lang == "RU":
+            emb = discord.Embed(
+                title='Понг!',
+                description=f'Пинг: {int(round(self.bot.latency, 4) * 1000)}',
+                color=ctx.guild.me.color
+            )
+        elif lang == "EN":
+            emb = discord.Embed(
+                title='Pong!',
+                description=f'Latency: {int(round(self.bot.latency, 4) * 1000)}',
+                color=ctx.guild.me.color
+            )
         await ctx.reply(embed=emb)
         print(f"{Fore.LIGHTCYAN_EX}[{datetime.now()}] [I] [COMMND] - 'ping' command executed by {ctx.author}.{Style.RESET_ALL}")
 
     @commands.command()
     async def version(self, ctx):
-        emb = discord.Embed(
-            title='Версии',
-            description=f'Версия: `{self.bot.conf["ro.bot.version"]}`\nВерсия Python: `{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}`\nВерсия discord.py: `{discord.__version__}`',
-            color=0xff0000
-        )
+        lang = self.check_lang(ctx.guild)
+        if lang == "RU":
+            emb = discord.Embed(
+                title='Версии',
+                description=f'Версия: `{self.bot.conf["ro.bot.version"]}`\nВерсия Python: `{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}`\nВерсия discord.py: `{discord.__version__}`',
+                color=0xff0000
+            )
+        elif lang == "EN":
+            emb = discord.Embed(
+                title='Versions',
+                description=f'Bot Version: `{self.bot.conf["ro.bot.version"]}`\nPython Version: `{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}`\ndiscord.py Version: `{discord.__version__}`',
+                color=0xff0000
+            )
         await ctx.reply(embed=emb)
         print(f"{Fore.LIGHTCYAN_EX}[{datetime.now()}] [I] [COMMND] - 'version' command executed by {ctx.author}.{Style.RESET_ALL}")
 
     @commands.command(aliases=["quit", 'logout', 'выйти', 'выключить', 'вырубить', 'poweroff'])
     async def logoff(self, ctx):
         if self.bot.ownercheck(ctx.author.id):
-            await ctx.reply("Выключаюсь...")
+            await ctx.reply("Logging off...")
             # 4(x^2) - 3x + 1 = 0
             # a = 4, b = -3, c = +3
             # D = b^2 - 4ac = -3^2 - 4 * 4 * 3 = 9 - 48 = -39
@@ -86,8 +116,6 @@ class Utils(commands.Cog):
             print(f"{Fore.LIGHTCYAN_EX}[{datetime.now()}] [I] [CLIENT] - Logged out.{Style.RESET_ALL}")
             sys.exit()
 
-
-
     @commands.command()
     async def reload(self, ctx):
         if self.bot.ownercheck(ctx.author.id):
@@ -98,19 +126,26 @@ class Utils(commands.Cog):
                     else:
                         print(f'{Fore.YELLOW}[{datetime.now()}] [W] [RELOAD] - Is cogs.{i[:-3]} loaded?!{Style.RESET_ALL}')
                     self.bot.load_extension(f'cogs.{i[:-3]}')
-            await ctx.send('Бот перезагружен!')
+            await ctx.reply('Bot Reloaded!')
             print(f'{Fore.LIGHTYELLOW_EX}[{datetime.now()}] [I] [RELOAD] - Reloaded by {ctx.author}.{Style.RESET_ALL}')
     
     @ping.error
     async def on_ping_error(self, ctx, error):
         if isinstance(error, commands.CommandOnCooldown):
-            emb = discord.Embed(
-                title='Вы заморожены!',
-                description=f'Попробуйте выполнить команду примерно через {int(error.retry_after)} секунд!',
-                color=0xff0000
-            )
+            lang = self.check_lang(ctx.guild)
+            if lang == "RU":
+                emb = discord.Embed(
+                    title='Вы заморожены!',
+                    description=f'Попробуйте выполнить команду примерно через {int(error.retry_after)} секунд(у)!',
+                    color=0xff0000
+                )
+            elif lang == "EN":
+                emb = discord.Embed(
+                    title='You are on Cooldown!',
+                    description=f'Try again in about {int(error.retry_after)} second(s)!',
+                    color=0xff0000
+                )
             emb.set_footer(text=ctx.author, icon_url=ctx.author.avatar_url)
-
             await ctx.reply(embed=emb)
 
 def setup(bot):

@@ -17,3 +17,5 @@
 [utils.py] Add cooldown to ping # Krutos
 [credit.py] Add command to load db, sc is unique for any guild # Krutos
 [utils.py] Fixed guild leave.
+
+[everything] mostly did a big update by myself # Calamity

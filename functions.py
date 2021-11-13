@@ -1,4 +1,4 @@
-import sys, os, discord, shutil, psutil
+import sys, os, discord, shutil, psutil, json
 from colorama import Fore, Back, Style
 from datetime import datetime
 from copy import copy
@@ -22,8 +22,7 @@ def backup():
     print(f'{Fore.LIGHTGREEN_EX}[{datetime.now()}] [I] [BACKUP] - Backed up database to "{backup}"!{Style.RESET_ALL}')
     del backup
 
-
-class STD:
+class STD: # sexually transmitted disease
     def __init__(self, date):
         self.basesys = sys.stdout
         self.stdout = []
@@ -106,9 +105,9 @@ def debug_info(conf):
 
 async def perms_error(ctx):
     emb = discord.Embed(
-                title='Ошибка прав!',
-                description='Ну и ну! Китай Правительство вам не выдать разрешение **Управление Ролями**, поэтому вы не мочь изменять социальный кредит! Много смех!',
-                color=0xff0000
+        title='Permissions Error!',
+        description='The CCP didn\'t gave you the **Manage Roles** permission, so you cannot edit the Social Credit Scores! Lots Of Laughs! `(англ. язык временно, потом фикс)`',
+        color=0xff0000
     )
     emb.set_image(url='https://media.discordapp.net/attachments/883778578783821865/896453128185081896/unknown.png')
     emb.set_footer(text=ctx.author,icon_url=ctx.author.avatar_url)
@@ -116,11 +115,10 @@ async def perms_error(ctx):
 
 async def member_not_found(ctx, type):
     emb = discord.Embed(
-        title='Гражданин не обнаружен!',
-        description=f'Ну и ну! Бот не смочь найти гражданин для {type} социальный кредит!',
+        title='Citizen not found!',
+        description=f'The Bot couldn\'t find the citizen for editing their Social Credit Score! `(англ. язык временно, потом фикс)`',
         color=0xff0000
     )
     emb.set_image(url='https://media.discordapp.net/attachments/883779765415337995/896458794886918225/unknown.png')
     emb.set_footer(text=ctx.author, icon_url=ctx.author.avatar_url)
-
     await ctx.send(embed=emb)
