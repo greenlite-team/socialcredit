@@ -493,7 +493,8 @@ class credit(commands.Cog): # я не ебу - а ты еби-
             `sc.balance/кредит/cred/c/bal <юзер>` - Обзор Социальный Кредит гражданин
             `sc.add/добавить/plus/a/доб <юзер> <кредит>` - Добавить Социальный Кредит гражданину
             `sc.remove/убрать/minus/rm/r/d/уб <юзер> <кредит>` - Отнять Социальный Кредит гражданина
-            `sc.set/установить/s/ус <юзер> <кредит>` - Установить Социальный Кредит гражданина  
+            `sc.set/установить/s/ус <юзер> <кредит>` - Установить Социальный Кредит гражданина
+            `sc.reset/restart/стереть` - Стереть Социальный Кредит сервер (только для создатель сервер, необратимо)
             """, inline=False
             )
             emb.add_field(
@@ -527,6 +528,7 @@ class credit(commands.Cog): # я не ебу - а ты еби-
             `sc.add/plus/a <user> <credit>` - Add Social Credit Score to a citizen
             `sc.remove/minus/rm/r/d <user> <credit>` - Remove Social Credit Score from a citizen
             `sc.set/s <user> <credit>` - Set a citizen's Social Credit Score
+            `sc.reset/restart` - Reset the server's Social Credit Scores (only for server owner, nonreversible)
             """, inline=False
             )
             emb.add_field(

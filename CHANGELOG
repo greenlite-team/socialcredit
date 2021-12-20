@@ -22,4 +22,5 @@
 
 [credit.py] replaced id2 with gid (guild id) # Calamity 
 [credit.py] implemented server reset # Calamity
-[bot.py] members intent
+[bot.py] members intent # Calamity
+[bot.py] guild count # Calamity

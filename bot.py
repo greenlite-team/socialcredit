@@ -89,7 +89,10 @@ async def on_ready():
         if os.path.isfile(os.path.join("cogs", i)):
             if not f'cogs.{i[:-3]}' in bot.extensions:
                 bot.load_extension(f'cogs.{i[:-3]}')
-    
+
+@bot.command()
+async def guildcount(ctx):
+    await ctx.reply(len(bot.guilds))
 
 # =======
 # КОМАНДЫ
