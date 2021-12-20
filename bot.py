@@ -28,7 +28,7 @@ backup()
 
 intents = discord.Intents.default()
 intents.members = True
-bot = commands.Bot(command_prefix='scd.',owner_ids=[528606316432719908,453167201780760577],intents=intents)
+bot = commands.Bot(command_prefix='sc.',owner_ids=[528606316432719908,453167201780760577],intents=intents)
 bot.conf = copy(conf)
 
 # ======
