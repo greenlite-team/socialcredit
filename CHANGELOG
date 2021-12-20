@@ -1,5 +1,5 @@
 [.gitignore] Added __pycache__ #Krutos
-[bot.py] [cogs/credit.py] Added logs type - [W](arning), [E](rror)... #Krutos
+[bot.py] [cogs/credit.py] Added logs type - [W]arning, [E]rror... #Krutos
 [functions.py] Added file to delete some shitcode. #Krutos
 [functions.py] debug_info function is now here. #Krutos
 [bot.py] Importing functions.py to output our debug_info. #Krutos
@@ -19,3 +19,7 @@
 [utils.py] Fixed guild leave.
 
 [everything] mostly did a big update by myself # Calamity
+
+[credit.py] replaced id2 with gid (guild id) # Calamity 
+[credit.py] implemented server reset # Calamity
+[bot.py] members intent

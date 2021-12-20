@@ -66,60 +66,60 @@ class credit(commands.Cog): # я не ебу - а ты еби-
 
     def add_user(self, user, guild):
         id = str(user.id)
-        id2 = str(guild.id)
-        if not id2 in self.bot.db:
-            self.bot.db.update({id2: {id: {"username": f"{user}", "credit": 1000}}})
+        gid = str(guild.id)
+        if not gid in self.bot.db:
+            self.bot.db.update({gid: {id: {"username": f"{user}", "credit": 1000}}})
             print(f"{Fore.LIGHTBLUE_EX}[{datetime.now()}] [I] [DATABS] - Guild {guild.name} added to DB.{Style.RESET_ALL}")
         else:
-            if not id in self.bot.db[id2]: # Если id не в DB
-                self.bot.db[id2].update({id: {"username": f"{user}", "credit": 1000}})
+            if not id in self.bot.db[gid]: # Если id не в DB
+                self.bot.db[gid].update({id: {"username": f"{user}", "credit": 1000}})
                 print(f"{Fore.LIGHTBLUE_EX}[{datetime.now()}] [I] [DATABS] - User {user} loaded into DB at guild {guild.name}.{Style.RESET_ALL}")
 
     def check_user(self, user, guild):
         id = str(user.id)
-        id2 = str(guild.id)
-        if not id2 in self.bot.db: self.add_user(user, guild)
-        elif not id in self.bot.db[id2]: self.add_user(user, guild)
-        self.bot.db[id2][id]["username"] = f"{user}"
-        return self.bot.db[id2][id] # {"username": "Каламя :3#3483", "credit": 1340}
+        gid = str(guild.id)
+        if not gid in self.bot.db: self.add_user(user, guild)
+        elif not id in self.bot.db[gid]: self.add_user(user, guild)
+        self.bot.db[gid][id]["username"] = f"{user}"
+        return self.bot.db[gid][id] # {"username": "Каламя :3#3483", "credit": 1340}
     
     def add_to_user(self, user, guild, num: int):
         id = str(user.id)
-        id2 = str(guild.id)
-        if not id2 in self.bot.db: self.add_user(user, guild)
-        elif not id in self.bot.db[id2]: self.add_user(user, guild)
-        self.bot.db[id2][id]["username"] = f"{user}"
+        gid = str(guild.id)
+        if not gid in self.bot.db: self.add_user(user, guild)
+        elif not id in self.bot.db[gid]: self.add_user(user, guild)
+        self.bot.db[gid][id]["username"] = f"{user}"
         if num < 0: raise ValueError
         if num > 2000: num = 2000 # лимит добавления ёпт
-        if self.bot.db[id2][id]["credit"] + num > 100000: 
-            self.bot.db[id2][id]["credit"] = 100000 # Чел, двести iq
+        if self.bot.db[gid][id]["credit"] + num > 100000: 
+            self.bot.db[gid][id]["credit"] = 100000 # Чел, двести iq
             # 1000 - лимит, 900 - было, 200 - добавляем, 100 - надо вернуть
             # 900 + 200 - 1000 = 100
         else:
-            self.bot.db[id2][id]["credit"] += num
-        return self.bot.db[id2][id]
+            self.bot.db[gid][id]["credit"] += num
+        return self.bot.db[gid][id]
 
     def remove_from_user(self, user, guild, num: int):
         id = str(user.id)
-        id2 = str(guild.id)
-        if not id2 in self.bot.db: self.add_user(user, guild)
-        elif not id in self.bot.db[id2]: self.add_user(user, guild)
-        self.bot.db[id2][id]["username"] = f"{user}"
+        gid = str(guild.id)
+        if not gid in self.bot.db: self.add_user(user, guild)
+        elif not id in self.bot.db[gid]: self.add_user(user, guild)
+        self.bot.db[gid][id]["username"] = f"{user}"
         if num < 0: num = num-num-num # делает из отрицательного числа положительное
         if num > 2000: num = 2000
-        self.bot.db[id2][id]["credit"] -= num
-        return self.bot.db[id2][id]
+        self.bot.db[gid][id]["credit"] -= num
+        return self.bot.db[gid][id]
 
     def set_to_user(self, user, guild, num: int):
         id = str(user.id)
-        id2 = str(guild.id)
-        if not id2 in self.bot.db: self.add_user(user, guild)
-        elif not id in self.bot.db[id2]: self.add_user(user, guild)
-        self.bot.db[id2][id]["username"] = f"{user}"
+        gid = str(guild.id)
+        if not gid in self.bot.db: self.add_user(user, guild)
+        elif not id in self.bot.db[gid]: self.add_user(user, guild)
+        self.bot.db[gid][id]["username"] = f"{user}"
         if num > 100000: num = 100000
         if num < -100000: num = -100000
-        self.bot.db[id2][id]["credit"] = num
-        return self.bot.db[id2][id]
+        self.bot.db[gid][id]["credit"] = num
+        return self.bot.db[gid][id]
 
     def set_lang(self, guild, lang):
         gid = str(guild.id)
@@ -134,6 +134,11 @@ class credit(commands.Cog): # я не ебу - а ты еби-
     def check_lang(self, guild):
         gid = str(guild.id)
         return self.bot.db[gid]["lang"]
+
+    def reset_guild(self,guild):
+        gid = str(guild.id)
+        lang = self.check_lang(guild)
+        self.bot.db.update({gid: {"lang": f"{lang}", "528606316432719908": {"username": "Calamity#3483","credit": 50000}}})
 
     def rank(self, num: int):
         if   num >= 50000: return "X"
@@ -338,7 +343,7 @@ class credit(commands.Cog): # я не ебу - а ты еби-
             elif lang == "EN":
                 nouseremb = discord.Embed(
                     title='Error!',
-                    description='You forgot to point user for removing Social Credit!',
+                    description='You forgot to set user for removing Social Credit!',
                     color = 0xff0000
                 )
             nouseremb.set_footer(text=ctx.author, icon_url=ctx.author.avatar_url)
@@ -598,7 +603,51 @@ class credit(commands.Cog): # я не ебу - а ты еби-
             emb.set_footer(text=ctx.author, icon_url=ctx.author.avatar_url)
             await ctx.reply(embed=emb)
             print(f"{Fore.LIGHTRED_EX}[{datetime.now()}] [E] [CMDERR] - User {ctx.author} tried to set a language but did not set a correct one.{Style.RESET_ALL}")
-            
+
+    @commands.command(aliases=['рестарт','стереть','restart'])
+    async def reset(self, ctx):
+        # self.reset_guild(ctx.guild)
+        lang = self.check_lang(ctx.guild)
+        if ctx.author == ctx.guild.owner:
+            self.reset_guild(ctx.guild)
+            if lang == "RU":
+                emb = discord.Embed(
+                    title='Успешно!',
+                    description='Социальный Кредит сервер очищен!',
+                    color=0x00ff00
+                )
+                emb.set_thumbnail(url=ctx.guild.me.avatar_url)
+                emb.set_footer(text=f'Очищено {ctx.author}', icon_url=ctx.author.avatar_url)
+                await ctx.reply(embed=emb)
+            elif lang == "EN":
+                emb = discord.Embed(
+                    title='Success!',
+                    description='Social Credit Scores of this server have been reset!',
+                    color=0x00ff00
+                )
+                emb.set_thumbnail(url=ctx.guild.me.avatar_url)
+                emb.set_footer(text=f'Reset by {ctx.author}', icon_url=ctx.author.avatar_url)
+                await ctx.reply(embed=emb)
+        else: 
+            if lang == "RU":
+                emb = discord.Embed(
+                    title='Ошибка!',
+                    description='Вы не быть создатель сервер!',
+                    color=0xff0000
+                )
+                emb.set_thumbnail(url=ctx.guild.me.avatar_url)
+                emb.set_footer(text=ctx.author, icon_url=ctx.author.avatar_url)
+                await ctx.reply(embed=emb)
+            elif lang == "EN":
+                emb = discord.Embed(
+                    title='Error!',
+                    description='You are not the server\'s owner!',
+                    color=0xff0000
+                )
+                emb.set_thumbnail(url=ctx.guild.me.avatar_url)
+                emb.set_footer(text=ctx.author, icon_url=ctx.author.avatar_url)
+                await ctx.reply(embed=emb)
+
 # ==========
 # = ОШИБКИ =
 # ==========
