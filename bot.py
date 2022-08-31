@@ -1,9 +1,9 @@
-import discord, json, os, random,shutil, sys
-from discord import colour
-from discord.ext import commands
+import disnake, json, os, random,shutil, sys
+from disnake import colour
+from disnake.ext import commands
 from datetime import datetime
 from colorama import init, Style, Back, Fore
-from discord.ext.commands.core import check
+from disnake.ext.commands.core import check
 from functions import debug_info, redefine_std, backup, version_check, release_info
 from copy import copy
 with open("env.json", encoding="utf-8") as file: conf = json.load(file)
@@ -26,9 +26,10 @@ backup()
 
 # async with ctx.channel.typing():
 
-intents = discord.Intents.default()
+intents = disnake.Intents.default()
 intents.members = True
-bot = commands.Bot(command_prefix='sc.',owner_ids=[528606316432719908,453167201780760577],intents=intents)
+intents.message_content = True
+bot = commands.Bot(command_prefix='sc.',owner_ids=[528606316432719908,453167201780760577],test_guilds=[883778577609412660],intents=intents)
 bot.conf = copy(conf)
 
 # ======
@@ -57,23 +58,23 @@ def check_lang(guild):
 @bot.event
 async def on_command_error(ctx, error):
     blacklist = ["MissingPermissions", "MemberNotFound", "CommandNotFound", "CommandOnCooldown"] # Расизм, расия)
-    if isinstance(error, discord.ext.commands.CommandNotFound):
+    if isinstance(error, disnake.ext.commands.CommandNotFound):
         err = str(error).replace("Command \"", "").replace("\" is not found", "")
         lang = check_lang(ctx.guild)
         if lang == "RU":
-            emb = discord.Embed(
+            emb = disnake.Embed(
                 title='Команда не найдена!',
                 description=f'Ну и ну! Бот не смочь найти команда "{err}"!',
                 color=0xff0000
             )
         elif lang == "EN":
-            emb = discord.Embed(
+            emb = disnake.Embed(
                 title='Command not found!',
                 description=f'Well, the Bot couldn\'t find the "{err}" command!',
                 color=0xff0000
             )
         emb.set_image(url='https://media.discordapp.net/attachments/883779765415337995/896458794886918225/unknown.png')
-        emb.set_footer(text=ctx.author, icon_url=ctx.author.avatar_url)
+        emb.set_footer(text=ctx.author, icon_url=ctx.author.avatar.url)
 
         await ctx.reply(embed=emb)
     if type(error).__name__ in blacklist: return
@@ -82,8 +83,8 @@ async def on_command_error(ctx, error):
 
 @bot.event
 async def on_ready():
-    stream = discord.Streaming(platform='China',name='sc.',game='Social Credit',url='https://clmty.xyz/')
-    await bot.change_presence(status=discord.Status.idle, activity=stream)
+    stream = disnake.Game('patching for / cmds')
+    await bot.change_presence(status=disnake.Status.idle, activity=stream)
     print(f'{Fore.GREEN}[{datetime.now()}] [I] [CLIENT] - Launched.{Style.RESET_ALL}')
     for i in os.listdir("cogs"):
         if os.path.isfile(os.path.join("cogs", i)):

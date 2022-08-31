@@ -1,8 +1,7 @@
-import discord, colorama, sys, os, json
+import disnake, colorama, sys, os, json
 from datetime import datetime
 from colorama import Back, Fore, Style
-from discord.embeds import Embed
-from discord.ext import commands, tasks
+from disnake.ext import commands, tasks
 from functions import backup
 from time import sleep
 
@@ -22,7 +21,7 @@ class Utils(commands.Cog):
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
         print(f"{Fore.LIGHTGREEN_EX}[{datetime.now()}] [I] [+GUILD] - Bot joined a new guild: '{guild.name}'. Member count: '{guild.member_count}'.{Style.RESET_ALL}")
-        emb = discord.Embed(
+        emb = disnake.Embed(
             title=':wave: Здравствуйте!',
             description="Я есть Социальный Кредит бот разработанный `Calamity#3483` и `KrutosX#3599` совместно с Коммунистическая Партия Китай.",
             color=0xb8493c
@@ -47,40 +46,40 @@ class Utils(commands.Cog):
         print(f"{Fore.LIGHTRED_EX}[{datetime.now()}] [I] [-GUILD] - Bot left guild: '{guild.name}'. Member count: '{guild.member_count}'.{Style.RESET_ALL}")
     
     @commands.cooldown(rate=1, per=10)
-    @commands.command()
+    @commands.command(description="пингануть")
     async def ping(self, ctx):
         lang = self.check_lang(ctx.guild)
         if lang == "RU":
-            emb = discord.Embed(
+            emb = disnake.Embed(
                 title='Понг!',
                 description=f'Пинг: {int(round(self.bot.latency, 4) * 1000)}',
                 color=ctx.guild.me.color
             )
         elif lang == "EN":
-            emb = discord.Embed(
+            emb = disnake.Embed(
                 title='Pong!',
                 description=f'Latency: {int(round(self.bot.latency, 4) * 1000)}',
                 color=ctx.guild.me.color
             )
-        await ctx.reply(embed=emb)
+        await ctx.send(embed=emb,ephemeral=True)
         print(f"{Fore.LIGHTCYAN_EX}[{datetime.now()}] [I] [COMMND] - 'ping' command executed by {ctx.author}.{Style.RESET_ALL}")
 
-    @commands.command()
+    @commands.command(description="информация о боте")
     async def version(self, ctx):
         lang = self.check_lang(ctx.guild)
         if lang == "RU":
-            emb = discord.Embed(
+            emb = disnake.Embed(
                 title='Версии',
-                description=f'Версия: `{self.bot.conf["ro.bot.version"]}`\nВерсия Python: `{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}`\nВерсия discord.py: `{discord.__version__}`',
+                description=f'Версия: `{self.bot.conf["ro.bot.version"]}`\nВерсия Python: `{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}`\nВерсия disnake: `{disnake.__version__}`',
                 color=0xff0000
             )
         elif lang == "EN":
-            emb = discord.Embed(
+            emb = disnake.Embed(
                 title='Versions',
-                description=f'Bot Version: `{self.bot.conf["ro.bot.version"]}`\nPython Version: `{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}`\ndiscord.py Version: `{discord.__version__}`',
+                description=f'Bot Version: `{self.bot.conf["ro.bot.version"]}`\nPython Version: `{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}`\ndisnake Version: `{disnake.__version__}`',
                 color=0xff0000
             )
-        await ctx.reply(embed=emb)
+        await ctx.send(embed=emb)
         print(f"{Fore.LIGHTCYAN_EX}[{datetime.now()}] [I] [COMMND] - 'version' command executed by {ctx.author}.{Style.RESET_ALL}")
 
     @commands.command(aliases=["quit", 'logout', 'выйти', 'выключить', 'вырубить', 'poweroff'])
@@ -134,18 +133,18 @@ class Utils(commands.Cog):
         if isinstance(error, commands.CommandOnCooldown):
             lang = self.check_lang(ctx.guild)
             if lang == "RU":
-                emb = discord.Embed(
+                emb = disnake.Embed(
                     title='Вы заморожены!',
                     description=f'Попробуйте выполнить команду примерно через {int(error.retry_after)} секунд(у)!',
                     color=0xff0000
                 )
             elif lang == "EN":
-                emb = discord.Embed(
+                emb = disnake.Embed(
                     title='You are on Cooldown!',
                     description=f'Try again in about {int(error.retry_after)} second(s)!',
                     color=0xff0000
                 )
-            emb.set_footer(text=ctx.author, icon_url=ctx.author.avatar_url)
+            emb.set_footer(text=ctx.author, icon_url=ctx.author.avatar.url)
             await ctx.reply(embed=emb)
 
 def setup(bot):

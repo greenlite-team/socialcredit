@@ -1,7 +1,7 @@
 # Social Credit Bot
 ## **A Bot for Social Credit Score management**
 \
-A **discord.py** bot made by [Calamity](https://clmty.xyz) and [KrutosX](https://github.com/KrutosVIP) within the rise of the Social Credit meme, and now you can have moderators manage your members' Social Credit score on your own server!
+A **disnake** bot made by [Calamity](https://clmty.xyz) and [KrutosX](https://github.com/KrutosVIP) within the rise of the Social Credit meme, and now you can have moderators manage your members' Social Credit score on your own server!
 
 ![the chinese emoji thumbs up](https://images-ext-2.discordapp.net/external/ca1_bYpaa-gjPJvExilq5G1zgaj1OJLhj5OCSzkxdvI/%3Fsize%3D1024/https/cdn.discordapp.com/avatars/895688121285509151/a89b1630ae57e50586c078a5f496828b.webp?width=676&height=676)
 

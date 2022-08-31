@@ -1,6 +1,5 @@
-import discord, json
-from discord.ext import commands
-from discord.embeds import Embed
+import disnake, json
+from disnake.ext import commands
 from datetime import datetime
 from colorama import Back, Fore, Style
 
@@ -21,17 +20,17 @@ class kek(commands.Cog):
     async def tanks(self, ctx):
         lang = self.check_lang(ctx.guild)
         if lang == "RU":
-            emb = discord.Embed(
+            emb = disnake.Embed(
                 title='Ничего не происходить в 1989 на Площади Тяньаньмэнь!',
                 color = ctx.guild.me.color
             ) # ничего не происходить в комментарий строка 27 файл kek.py
         elif lang == "EN":
-            emb = discord.Embed(
+            emb = disnake.Embed(
                 title='Nothing happened in 1989 on the Tiananmen Square!',
                 color = ctx.guild.me.color
             )
         emb.set_image(url='https://media.discordapp.net/attachments/883778578318258222/897894172915294239/unknown.png')
-        emb.set_footer(text=ctx.author,icon_url=ctx.author.avatar_url)
+        emb.set_footer(text=ctx.author,icon_url=ctx.author.avatar.url)
         await ctx.reply(embed=emb)
 
 def setup(bot):
